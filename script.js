@@ -1,5 +1,88 @@
 // Language switching functionality
 document.addEventListener('DOMContentLoaded', function() {
+    // Hero Slideshow functionality
+    const slideshow = {
+        images: document.querySelectorAll('.hero-image'),
+        currentIndex: 0,
+        interval: null,
+
+        init() {
+            // Start automatic slideshow
+            this.startSlideshow();
+
+            // Pause on hover
+            const heroSection = document.querySelector('.hero');
+            heroSection.addEventListener('mouseenter', () => this.pauseSlideshow());
+            heroSection.addEventListener('mouseleave', () => this.startSlideshow());
+        },
+
+        goToSlide(index) {
+            // Remove active class from current
+            this.images[this.currentIndex].classList.remove('active');
+
+            // Update current index
+            this.currentIndex = index;
+
+            // Add active class to new current
+            this.images[this.currentIndex].classList.add('active');
+        },
+
+        nextSlide() {
+            const nextIndex = (this.currentIndex + 1) % this.images.length;
+            this.goToSlide(nextIndex);
+        },
+
+        startSlideshow() {
+            if (this.interval) clearInterval(this.interval);
+            this.interval = setInterval(() => this.nextSlide(), 3000);
+        },
+
+        pauseSlideshow() {
+            if (this.interval) {
+                clearInterval(this.interval);
+                this.interval = null;
+            }
+        }
+    };
+
+    // Initialize slideshow
+    slideshow.init();
+
+    // Page flip effect
+    const hero = document.querySelector('.hero-slideshow');
+    const biography = document.querySelector('.biography');
+    let lastScrollY = window.scrollY;
+    let ticking = false;
+
+    function updatePageFlip() {
+        const scrollY = window.scrollY;
+        const heroHeight = hero.offsetHeight;
+        const scrollPercent = Math.min(scrollY / heroHeight, 1);
+        
+        // Apply transform to hero section
+        if (scrollY <= heroHeight) {
+            const rotateX = scrollPercent * 90;
+            const translateZ = scrollPercent * -100;
+            hero.style.transform = `rotateX(${rotateX}deg) translateZ(${translateZ}px)`;
+            hero.style.opacity = 1 - scrollPercent;
+        }
+
+        // Move biography section up
+        biography.style.transform = `translateY(${-scrollY}px) translateZ(1px)`;
+        
+        lastScrollY = scrollY;
+        ticking = false;
+    }
+
+    window.addEventListener('scroll', () => {
+        if (!ticking) {
+            window.requestAnimationFrame(() => {
+                updatePageFlip();
+            });
+            ticking = true;
+        }
+    });
+
     // Header scroll effect
     const header = document.querySelector('header');
     const heroSection = document.querySelector('.hero');
@@ -22,7 +105,10 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Enhanced language detection
     function detectLanguage() {
-        // First check localStorage for user's previous preference
+        // Always default to Traditional Chinese
+        const defaultLang = 'tw';
+        
+        // Check localStorage for user's previous preference
         const savedLang = localStorage.getItem('preferredLanguage');
         if (savedLang && translations[savedLang]) {
             return savedLang;
@@ -62,13 +148,20 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }
 
-        // Default to Traditional Chinese if no match found
-        return 'tw';
+        // Return Traditional Chinese as default
+        return defaultLang;
     }
     
-    // Set initial language
+    // Set initial language to Traditional Chinese
     const initialLang = detectLanguage();
     setLanguage(initialLang);
+
+    // Update language switcher buttons to show TW as default
+    document.querySelectorAll('.language-switch').forEach(switcher => {
+        if (!localStorage.getItem('preferredLanguage')) {
+            switcher.textContent = 'TW ▾';
+        }
+    });
     
     // Language switcher functionality
     const languageSwitchers = document.querySelectorAll('.language-switch');
@@ -102,29 +195,54 @@ document.addEventListener('DOMContentLoaded', function() {
     const mobileMenu = document.querySelector('.mobile-menu');
     const body = document.body;
 
+    function toggleMobileMenu(show) {
+        hamburger.classList.toggle('active', show);
+        mobileMenu.classList.toggle('active', show);
+        body.style.overflow = show ? 'hidden' : '';
+        
+        // Ensure menu is displayed before starting animations
+        if (show) {
+            mobileMenu.style.display = 'block';
+            // Force reflow
+            mobileMenu.offsetHeight;
+        }
+    }
+
     hamburger.addEventListener('click', function() {
-        this.classList.toggle('active');
-        mobileMenu.classList.toggle('active');
-        body.style.overflow = mobileMenu.classList.contains('active') ? 'hidden' : '';
+        const willShow = !this.classList.contains('active');
+        toggleMobileMenu(willShow);
     });
 
     // Close mobile menu when clicking a link
     const mobileLinks = document.querySelectorAll('.mobile-nav-links a');
     mobileLinks.forEach(link => {
         link.addEventListener('click', () => {
-            hamburger.classList.remove('active');
-            mobileMenu.classList.remove('active');
-            body.style.overflow = '';
+            toggleMobileMenu(false);
         });
     });
 
     // Close mobile menu when clicking outside
     mobileMenu.addEventListener('click', function(e) {
         if (e.target === this) {
-            hamburger.classList.remove('active');
-            mobileMenu.classList.remove('active');
-            body.style.overflow = '';
+            toggleMobileMenu(false);
         }
+    });
+
+    // Close mobile menu on escape key
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && mobileMenu.classList.contains('active')) {
+            toggleMobileMenu(false);
+        }
+    });
+
+    // Handle mobile menu language selection
+    const mobileLangButtons = document.querySelectorAll('.mobile-nav-links .language-dropdown button');
+    mobileLangButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            const lang = this.getAttribute('data-lang');
+            setLanguage(lang);
+            toggleMobileMenu(false);
+        });
     });
 
     // Carousel functionality
@@ -380,7 +498,10 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // Function to set language
 function setLanguage(lang) {
-    if (!translations[lang]) return;
+    // Default to Traditional Chinese if the requested language is not available
+    if (!translations[lang]) {
+        lang = 'tw';
+    }
     
     document.querySelectorAll('[data-i18n]').forEach(element => {
         const key = element.getAttribute('data-i18n');
@@ -399,8 +520,12 @@ function setLanguage(lang) {
         switcher.textContent = lang.toUpperCase() + ' ▾';
     });
     
-    // Save language preference
-    localStorage.setItem('preferredLanguage', lang);
+    // Save language preference only if it's different from the default
+    if (lang !== 'tw') {
+        localStorage.setItem('preferredLanguage', lang);
+    } else {
+        localStorage.removeItem('preferredLanguage');
+    }
 }
 
 // Helper function to get nested translations
