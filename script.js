@@ -61,10 +61,31 @@ document.addEventListener('DOMContentLoaded', function() {
     // Mobile menu toggle
     const hamburger = document.querySelector('.hamburger');
     const mobileMenu = document.querySelector('.mobile-menu');
-    
+    const body = document.body;
+
     hamburger.addEventListener('click', function() {
         this.classList.toggle('active');
         mobileMenu.classList.toggle('active');
+        body.style.overflow = mobileMenu.classList.contains('active') ? 'hidden' : '';
+    });
+
+    // Close mobile menu when clicking a link
+    const mobileLinks = document.querySelectorAll('.mobile-nav-links a');
+    mobileLinks.forEach(link => {
+        link.addEventListener('click', () => {
+            hamburger.classList.remove('active');
+            mobileMenu.classList.remove('active');
+            body.style.overflow = '';
+        });
+    });
+
+    // Close mobile menu when clicking outside
+    mobileMenu.addEventListener('click', function(e) {
+        if (e.target === this) {
+            hamburger.classList.remove('active');
+            mobileMenu.classList.remove('active');
+            body.style.overflow = '';
+        }
     });
 
     // Carousel functionality
