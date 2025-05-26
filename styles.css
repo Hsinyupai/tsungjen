@@ -142,15 +142,18 @@ header.scrolled .language-switch {
     padding: 0.5rem;
     z-index: 1002;
     position: relative;
+    width: 40px;
+    height: 40px;
 }
 
 .hamburger span {
     display: block;
-    width: 25px;
+    width: 24px;
     height: 2px;
     background-color: #fff;
-    margin: 5px 0;
+    margin: 5px auto;
     transition: all 0.3s ease;
+    position: relative;
 }
 
 header.scrolled .hamburger span {
@@ -164,34 +167,36 @@ header.scrolled .hamburger span {
     left: 0;
     width: 100%;
     height: 100vh;
-    background-color: #fff;
+    background-color: rgba(0, 0, 0, 0.95);
     z-index: 1001;
     opacity: 0;
     visibility: hidden;
     transition: all 0.3s ease;
+    padding: 80px 2rem;
 }
 
 .mobile-menu.active {
-    display: block;
     opacity: 1;
     visibility: visible;
+    display: block;
 }
 
 .mobile-nav-links {
     list-style: none;
-    padding: 80px 2rem 2rem;
     height: 100%;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
+    gap: 2rem;
 }
 
 .mobile-nav-links li {
-    margin: 1rem 0;
     opacity: 0;
     transform: translateY(20px);
     transition: all 0.3s ease;
+    text-align: center;
+    width: 100%;
 }
 
 .mobile-menu.active .mobile-nav-links li {
@@ -201,22 +206,24 @@ header.scrolled .hamburger span {
 
 .mobile-nav-links a {
     text-decoration: none;
-    color: #333;
-    font-size: 1.5rem;
+    color: #fff;
+    font-size: 2rem;
     font-weight: 500;
     transition: color 0.3s ease;
+    display: block;
+    padding: 0.5rem;
 }
 
 .mobile-nav-links a:hover {
-    color: #666;
+    color: rgba(255, 255, 255, 0.8);
 }
 
 .hamburger.active span {
-    background-color: #333;
+    background-color: #fff;
 }
 
 .hamburger.active span:nth-child(1) {
-    transform: rotate(45deg) translate(5px, 5px);
+    transform: translateY(7px) rotate(45deg);
 }
 
 .hamburger.active span:nth-child(2) {
@@ -224,7 +231,7 @@ header.scrolled .hamburger span {
 }
 
 .hamburger.active span:nth-child(3) {
-    transform: rotate(-45deg) translate(7px, -7px);
+    transform: translateY(-7px) rotate(-45deg);
 }
 
 /* Add staggered animation for menu items */
@@ -234,6 +241,47 @@ header.scrolled .hamburger span {
 .mobile-menu.active .mobile-nav-links li:nth-child(4) { transition-delay: 0.4s; }
 .mobile-menu.active .mobile-nav-links li:nth-child(5) { transition-delay: 0.5s; }
 
+/* Language selector in mobile menu */
+.mobile-nav-links .language-selector {
+    position: relative;
+    width: auto;
+}
+
+.mobile-nav-links .language-switch {
+    color: #fff;
+    font-size: 2rem;
+    padding: 0.5rem;
+    background: none;
+    border: none;
+    cursor: pointer;
+}
+
+.mobile-nav-links .language-dropdown {
+    position: relative;
+    top: auto;
+    right: auto;
+    background: none;
+    box-shadow: none;
+    text-align: center;
+    margin-top: 1rem;
+}
+
+.mobile-nav-links .language-dropdown button {
+    font-size: 1.5rem;
+    padding: 0.5rem;
+    text-align: center;
+    color: #fff;
+    background: none;
+    border: none;
+    cursor: pointer;
+    width: 100%;
+    transition: color 0.3s ease;
+}
+
+.mobile-nav-links .language-dropdown button:hover {
+    color: rgba(255, 255, 255, 0.8);
+}
+
 @media (max-width: 768px) {
     .nav-links {
         display: none;
@@ -241,6 +289,15 @@ header.scrolled .hamburger span {
     
     .hamburger {
         display: block;
+    }
+
+    .mobile-menu {
+        top: 0;
+        padding-top: 80px;
+    }
+
+    header.scrolled .hamburger.active span {
+        background-color: #fff;
     }
 }
 
@@ -250,12 +307,57 @@ header.scrolled .hamburger span {
     height: 100vh;
     width: 100%;
     margin-top: 0;
+    overflow: hidden;
+}
+
+.hero-slideshow {
+    width: 100%;
+    height: 100%;
+    position: relative;
 }
 
 .hero-image {
     width: 100%;
     height: 100%;
     object-fit: cover;
+    position: absolute;
+    top: 0;
+    left: 0;
+    opacity: 0;
+    transition: opacity 300ms ease-in-out;
+    will-change: opacity;
+    pointer-events: none;
+}
+
+.hero-image.active {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.slideshow-indicators {
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 10px;
+    z-index: 2;
+}
+
+.indicator {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    border: 2px solid #fff;
+    background: transparent;
+    padding: 0;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.indicator.active {
+    background: #fff;
+    transform: scale(1.2);
 }
 
 /* Biography section */
