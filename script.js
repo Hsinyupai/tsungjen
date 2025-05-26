@@ -10,26 +10,65 @@ document.addEventListener('DOMContentLoaded', function() {
         
         if (scrollPosition > 0) {
             header.classList.add('scrolled');
-            console.log('Header scrolled');
         } else {
             header.classList.remove('scrolled');
-            console.log('Header at top');
         }
     };
     
     window.addEventListener('scroll', handleScroll);
-    // Set initial state - if we're not at the top, add scrolled class
     if (window.scrollY > 0) {
         header.classList.add('scrolled');
     }
     
-    // Get user's preferred language from localStorage or browser
-    const savedLang = localStorage.getItem('preferredLanguage');
-    const browserLang = navigator.language.split('-')[0];
-    const defaultLang = savedLang || (translations[browserLang] ? browserLang : 'en');
+    // Enhanced language detection
+    function detectLanguage() {
+        // First check localStorage for user's previous preference
+        const savedLang = localStorage.getItem('preferredLanguage');
+        if (savedLang && translations[savedLang]) {
+            return savedLang;
+        }
+
+        // Get browser's language preferences
+        const browserLangs = navigator.languages || [navigator.language || navigator.userLanguage];
+        
+        // Map of browser language codes to our supported languages
+        const languageMap = {
+            'zh-TW': 'tw',
+            'zh-HK': 'tw', // Hong Kong uses Traditional Chinese
+            'zh-MO': 'tw', // Macau uses Traditional Chinese
+            'zh-CN': 'cn',
+            'zh': 'tw',    // Generic Chinese defaults to Traditional
+            'ja': 'jp',
+            'ja-JP': 'jp',
+            'en': 'en',
+            'en-US': 'en',
+            'en-GB': 'en'
+        };
+
+        // Try to find a matching language
+        for (const browserLang of browserLangs) {
+            const normalizedLang = browserLang.toLowerCase();
+            
+            // Check for exact match
+            if (languageMap[browserLang]) {
+                return languageMap[browserLang];
+            }
+            
+            // Check for partial match (e.g., 'en' matches 'en-US')
+            for (const [key, value] of Object.entries(languageMap)) {
+                if (normalizedLang.startsWith(key.toLowerCase())) {
+                    return value;
+                }
+            }
+        }
+
+        // Default to Traditional Chinese if no match found
+        return 'tw';
+    }
     
     // Set initial language
-    setLanguage(defaultLang);
+    const initialLang = detectLanguage();
+    setLanguage(initialLang);
     
     // Language switcher functionality
     const languageSwitchers = document.querySelectorAll('.language-switch');
