@@ -67,12 +67,22 @@ document.addEventListener('DOMContentLoaded', function() {
             hero.style.opacity = 1 - scrollPercent;
         }
 
-        // Move biography section up
+        // Move biography section up and handle visibility
         biography.style.transform = `translateY(${-scrollY}px) translateZ(1px)`;
+        
+        // Show biography when scrolled more than 30% of hero height
+        if (scrollY > heroHeight * 0.3) {
+            biography.classList.add('visible');
+        } else {
+            biography.classList.remove('visible');
+        }
         
         lastScrollY = scrollY;
         ticking = false;
     }
+
+    // Initial check for page load with scroll position
+    updatePageFlip();
 
     window.addEventListener('scroll', () => {
         if (!ticking) {

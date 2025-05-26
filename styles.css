@@ -360,8 +360,14 @@ header.scrolled .hamburger span {
     background-color: #f9f9f9;
     z-index: 2;
     transform-style: preserve-3d;
-    transform: translateZ(0);
+    transform: translateZ(1px);
     will-change: transform;
+    opacity: 0;
+    transition: opacity 0.5s ease-in-out;
+}
+
+.biography.visible {
+    opacity: 1;
 }
 
 .bio-content {
