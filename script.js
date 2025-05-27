@@ -34,7 +34,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         startSlideshow() {
             if (this.interval) clearInterval(this.interval);
-            this.interval = setInterval(() => this.nextSlide(), 3000);
+            this.interval = setInterval(() => this.nextSlide(), 2000);
         },
 
         pauseSlideshow() {
