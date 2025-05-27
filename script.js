@@ -48,71 +48,96 @@ document.addEventListener('DOMContentLoaded', function() {
     // Initialize slideshow
     slideshow.init();
 
-    // Page flip effect
-    const hero = document.querySelector('.hero-slideshow');
-    const biography = document.querySelector('.biography');
-    let lastScrollY = window.scrollY;
-    let ticking = false;
+    // Section-based scrolling
+    const sections = document.querySelectorAll('.hero, .biography, .gallery, .contact');
+    let isScrolling = false;
+    let currentSection = 0;
 
-    function updatePageFlip() {
-        const scrollY = window.scrollY;
-        const heroHeight = hero.offsetHeight;
-        const scrollPercent = Math.min(scrollY / heroHeight, 1);
-        
-        // Apply transform to hero section
-        if (scrollY <= heroHeight) {
-            const rotateX = scrollPercent * 90;
-            const translateZ = scrollPercent * -100;
-            hero.style.transform = `rotateX(${rotateX}deg) translateZ(${translateZ}px)`;
-            hero.style.opacity = 1 - scrollPercent;
-        }
+    function scrollToSection(index) {
+        if (index >= 0 && index < sections.length) {
+            isScrolling = true;
+            sections[index].scrollIntoView({ behavior: 'smooth' });
+            currentSection = index;
+            
+            // Update header style based on section
+            const header = document.querySelector('header');
+            if (index === 0) {
+                header.classList.remove('scrolled');
+            } else {
+                header.classList.add('scrolled');
+            }
 
-        // Move biography section up and handle visibility
-        biography.style.transform = `translateY(${-scrollY}px) translateZ(1px)`;
-        
-        // Show biography when scrolled more than 30% of hero height
-        if (scrollY > heroHeight * 0.3) {
-            biography.classList.add('visible');
-        } else {
-            biography.classList.remove('visible');
+            // Reset scrolling flag after animation
+            setTimeout(() => {
+                isScrolling = false;
+            }, 1000);
         }
-        
-        lastScrollY = scrollY;
-        ticking = false;
     }
 
-    // Initial check for page load with scroll position
-    updatePageFlip();
+    // Handle wheel events for section navigation
+    window.addEventListener('wheel', (e) => {
+        if (!isScrolling) {
+            if (e.deltaY > 0) {
+                // Scroll down
+                scrollToSection(currentSection + 1);
+            } else {
+                // Scroll up
+                scrollToSection(currentSection - 1);
+            }
+        }
+        e.preventDefault();
+    }, { passive: false });
 
-    window.addEventListener('scroll', () => {
-        if (!ticking) {
-            window.requestAnimationFrame(() => {
-                updatePageFlip();
-            });
-            ticking = true;
+    // Handle keyboard navigation
+    document.addEventListener('keydown', (e) => {
+        if (!isScrolling) {
+            if (e.key === 'ArrowDown' || e.key === 'PageDown') {
+                scrollToSection(currentSection + 1);
+                e.preventDefault();
+            } else if (e.key === 'ArrowUp' || e.key === 'PageUp') {
+                scrollToSection(currentSection - 1);
+                e.preventDefault();
+            }
         }
     });
 
-    // Header scroll effect
-    const header = document.querySelector('header');
-    const heroSection = document.querySelector('.hero');
-    
-    const handleScroll = () => {
-        const heroBottom = heroSection.offsetTop + heroSection.offsetHeight;
-        const scrollPosition = window.scrollY;
-        
-        if (scrollPosition > 0) {
-            header.classList.add('scrolled');
-        } else {
-            header.classList.remove('scrolled');
-        }
-    };
-    
-    window.addEventListener('scroll', handleScroll);
-    if (window.scrollY > 0) {
-        header.classList.add('scrolled');
-    }
-    
+    // Update current section on scroll end
+    let scrollTimeout;
+    window.addEventListener('scroll', () => {
+        clearTimeout(scrollTimeout);
+        scrollTimeout = setTimeout(() => {
+            const viewportMiddle = window.innerHeight / 2;
+            let closestSection = 0;
+            let closestDistance = Infinity;
+
+            sections.forEach((section, index) => {
+                const rect = section.getBoundingClientRect();
+                const distance = Math.abs(rect.top + rect.height / 2 - viewportMiddle);
+                if (distance < closestDistance) {
+                    closestDistance = distance;
+                    closestSection = index;
+                }
+            });
+
+            currentSection = closestSection;
+        }, 100);
+    });
+
+    // Handle navigation menu clicks
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function (e) {
+            e.preventDefault();
+            const targetId = this.getAttribute('href');
+            if (targetId === '#') return;
+            
+            const targetSection = document.querySelector(targetId);
+            const targetIndex = Array.from(sections).indexOf(targetSection);
+            if (targetIndex !== -1) {
+                scrollToSection(targetIndex);
+            }
+        });
+    });
+
     // Enhanced language detection
     function detectLanguage() {
         // Always default to Traditional Chinese
@@ -431,36 +456,75 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     };
 
-    // Modal functionality
+    // Artwork Modal functionality
     const modal = {
-        element: document.getElementById('artwork-modal'),
-        image: document.getElementById('modal-image'),
-        title: document.getElementById('modal-title'),
-        year: document.getElementById('modal-year'),
-        dimensions: document.getElementById('modal-dimensions'),
-        medium: document.getElementById('modal-medium'),
-        description: document.getElementById('modal-description'),
-        closeButton: document.querySelector('.modal-close'),
-        currentLang: 'en',
-
         init() {
-            // Add click event to all artwork slides
+            this.modal = document.getElementById('artwork-modal');
+            if (!this.modal) {
+                // Create modal if it doesn't exist
+                this.createModal();
+            }
+            
+            this.setupEventListeners();
+            this.setupArtworkClicks();
+        },
+
+        createModal() {
+            const modalHTML = `
+                <div id="artwork-modal" class="artwork-modal">
+                    <div class="modal-content">
+                        <button class="modal-close" aria-label="Close modal"></button>
+                        <div class="modal-body">
+                            <div class="artwork-image">
+                                <img id="modal-image" src="" alt="">
+                            </div>
+                            <div class="artwork-details">
+                                <h3 id="modal-title"></h3>
+                                <div class="artwork-metadata">
+                                    <p id="modal-year"></p>
+                                    <p id="modal-dimensions"></p>
+                                    <p id="modal-medium"></p>
+                                </div>
+                                <div class="artwork-description">
+                                    <p id="modal-description"></p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            document.body.insertAdjacentHTML('beforeend', modalHTML);
+            this.modal = document.getElementById('artwork-modal');
+        },
+
+        setupEventListeners() {
+            // Close button
+            const closeButton = this.modal.querySelector('.modal-close');
+            closeButton.addEventListener('click', () => this.hide());
+
+            // Click outside to close
+            this.modal.addEventListener('click', (e) => {
+                if (e.target === this.modal) {
+                    this.hide();
+                }
+            });
+
+            // Escape key to close
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape' && this.modal.classList.contains('active')) {
+                    this.hide();
+                }
+            });
+        },
+
+        setupArtworkClicks() {
             document.querySelectorAll('.carousel-slide').forEach(slide => {
                 slide.addEventListener('click', () => {
                     const artworkId = slide.getAttribute('data-artwork-id');
-                    this.show(artworkId);
+                    if (artworkId && artworkData[artworkId]) {
+                        this.show(artworkId);
+                    }
                 });
-            });
-
-            // Close modal events
-            this.closeButton.addEventListener('click', () => this.hide());
-            this.element.addEventListener('click', (e) => {
-                if (e.target === this.element) this.hide();
-            });
-
-            // Close on escape key
-            document.addEventListener('keydown', (e) => {
-                if (e.key === 'Escape') this.hide();
             });
         },
 
@@ -468,29 +532,40 @@ document.addEventListener('DOMContentLoaded', function() {
             const artwork = artworkData[artworkId];
             const lang = localStorage.getItem('preferredLanguage') || 'en';
             
-            this.image.src = `images/${artworkId}.jpg`;
-            this.image.alt = artwork.title[lang];
-            this.title.textContent = artwork.title[lang];
-            this.year.textContent = artwork.year;
-            this.dimensions.textContent = artwork.dimensions;
-            this.medium.textContent = artwork.medium;
-            this.description.textContent = artwork.description[lang];
+            const modalImage = this.modal.querySelector('#modal-image');
+            const modalTitle = this.modal.querySelector('#modal-title');
+            const modalYear = this.modal.querySelector('#modal-year');
+            const modalDimensions = this.modal.querySelector('#modal-dimensions');
+            const modalMedium = this.modal.querySelector('#modal-medium');
+            const modalDescription = this.modal.querySelector('#modal-description');
+
+            modalImage.src = `images/${artworkId}.jpg`;
+            modalImage.alt = artwork.title[lang];
+            modalTitle.textContent = artwork.title[lang];
+            modalYear.textContent = artwork.year;
+            modalDimensions.textContent = artwork.dimensions;
+            modalMedium.textContent = artwork.medium;
+            modalDescription.textContent = artwork.description[lang];
             
-            this.element.classList.add('active');
+            this.modal.classList.add('active');
             document.body.style.overflow = 'hidden';
         },
 
         hide() {
-            this.element.classList.remove('active');
+            this.modal.classList.remove('active');
             document.body.style.overflow = '';
         },
 
         updateLanguage(lang) {
-            const activeArtwork = this.image.src.split('/').pop().split('.')[0];
-            if (activeArtwork && artworkData[activeArtwork]) {
-                const artwork = artworkData[activeArtwork];
-                this.title.textContent = artwork.title[lang];
-                this.description.textContent = artwork.description[lang];
+            if (!this.modal.classList.contains('active')) return;
+            
+            const modalImage = this.modal.querySelector('#modal-image');
+            const artworkId = modalImage.src.split('/').pop().split('.')[0];
+            
+            if (artworkId && artworkData[artworkId]) {
+                const artwork = artworkData[artworkId];
+                this.modal.querySelector('#modal-title').textContent = artwork.title[lang];
+                this.modal.querySelector('#modal-description').textContent = artwork.description[lang];
             }
         }
     };
@@ -499,8 +574,8 @@ document.addEventListener('DOMContentLoaded', function() {
     modal.init();
 
     // Update modal language when language changes
-    const originalSetLanguage = setLanguage;
-    setLanguage = function(lang) {
+    const originalSetLanguage = window.setLanguage;
+    window.setLanguage = function(lang) {
         originalSetLanguage(lang);
         modal.updateLanguage(lang);
     };

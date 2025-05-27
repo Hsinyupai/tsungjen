@@ -8,6 +8,8 @@
 html {
     scroll-behavior: smooth;
     height: 100%;
+    scroll-snap-type: y mandatory;
+    overflow-y: scroll;
 }
 
 body {
@@ -16,10 +18,11 @@ body {
     color: #333;
     background-color: #fff;
     height: 100%;
+    margin: 0;
+    padding: 0;
     perspective: 1px;
     transform-style: preserve-3d;
     overflow-x: hidden;
-    overflow-y: auto;
 }
 
 main {
@@ -316,13 +319,20 @@ header.scrolled .hamburger span {
     }
 }
 
+/* Section styling */
+.hero, .biography, .gallery, .contact {
+    height: 100vh;
+    width: 100%;
+    scroll-snap-align: start;
+    scroll-snap-stop: always;
+    position: relative;
+    overflow: hidden;
+}
+
 /* Hero section */
 .hero {
     position: relative;
-    height: 100vh;
-    width: 100%;
     margin-top: 0;
-    overflow: hidden;
     transform-style: preserve-3d;
     z-index: 1;
 }
@@ -331,8 +341,6 @@ header.scrolled .hamburger span {
     width: 100%;
     height: 100%;
     position: relative;
-    transform-origin: top center;
-    will-change: transform;
 }
 
 .hero-image {
@@ -355,18 +363,12 @@ header.scrolled .hamburger span {
 
 /* Biography section */
 .biography {
-    position: relative;
     padding: 4rem 2rem;
     background-color: #f9f9f9;
     z-index: 2;
-    transform-style: preserve-3d;
-    transform: translateZ(1px);
-    will-change: transform;
-    opacity: 0;
-    transition: opacity 0.5s ease-in-out;
-}
-
-.biography.visible {
+    display: flex;
+    align-items: center;
+    justify-content: center;
     opacity: 1;
 }
 
@@ -376,7 +378,7 @@ header.scrolled .hamburger span {
     display: grid;
     grid-template-columns: 1fr 2fr;
     gap: 4rem;
-    align-items: start;
+    align-items: center;
 }
 
 .bio-image {
@@ -403,6 +405,9 @@ header.scrolled .hamburger span {
 .gallery {
     padding: 4rem 2rem;
     background-color: #fff;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
 }
 
 .carousel-container {
@@ -539,12 +544,25 @@ header.scrolled .hamburger span {
         padding: 0 40px;
         gap: 10px;
     }
+
+    .bio-content {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+        padding: 0 1rem;
+    }
+    
+    .hero, .biography, .gallery, .contact {
+        padding: 2rem 1rem;
+    }
 }
 
 /* Contact section */
 .contact {
     padding: 4rem 2rem;
     background-color: #f9f9f9;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .contact-info {
@@ -652,11 +670,6 @@ footer a {
         color: #333;
     }
 
-    .bio-content {
-        grid-template-columns: 1fr;
-        gap: 2rem;
-    }
-
     .bio-image {
         max-width: none;
         width: calc(100% + 4rem);
@@ -687,16 +700,17 @@ footer a {
     position: fixed;
     top: 0;
     left: 0;
-    right: 0;
-    bottom: 0;
+    width: 100vw;
+    height: 100vh;
     background: rgba(255, 255, 255, 0.98);
-    z-index: 2000;
+    z-index: 3000;
     opacity: 0;
-    transition: opacity 0.3s ease;
+    transition: all 0.3s ease;
+    overflow: hidden;
 }
 
 .artwork-modal.active {
-    display: block;
+    display: flex;
     opacity: 1;
 }
 
@@ -704,16 +718,15 @@ footer a {
     position: relative;
     width: 100%;
     height: 100%;
-    max-width: 1400px;
-    margin: 0 auto;
-    padding: 40px;
-    overflow-y: auto;
+    display: flex;
+    align-items: stretch;
+    padding: 0;
 }
 
 .modal-close {
     position: fixed;
-    top: 20px;
-    right: 20px;
+    top: 40px;
+    right: 40px;
     background: none;
     border: none;
     cursor: pointer;
@@ -722,58 +735,92 @@ footer a {
     display: flex;
     align-items: center;
     justify-content: center;
-    color: #333;
-    transition: transform 0.3s ease;
+    z-index: 3001;
+    transition: transform 0.2s ease;
 }
 
 .modal-close:hover {
-    transform: scale(1.1);
+    transform: rotate(90deg);
+}
+
+.modal-close::before,
+.modal-close::after {
+    content: '';
+    position: absolute;
+    width: 30px;
+    height: 2px;
+    background-color: #333;
+    transition: background-color 0.2s ease;
+}
+
+.modal-close:hover::before,
+.modal-close:hover::after {
+    background-color: #000;
+}
+
+.modal-close::before {
+    transform: rotate(45deg);
+}
+
+.modal-close::after {
+    transform: rotate(-45deg);
 }
 
 .modal-body {
-    display: grid;
-    grid-template-columns: 3fr 2fr;
-    gap: 40px;
-    padding-top: 40px;
+    display: flex;
+    width: 100%;
+    height: 100%;
 }
 
 .artwork-image {
+    flex: 1;
     position: relative;
-    width: 100%;
-    height: calc(100vh - 120px);
+    background-color: #f5f5f5;
+    overflow: hidden;
 }
 
 .artwork-image img {
     width: 100%;
     height: 100%;
     object-fit: contain;
+    padding: 40px;
 }
 
 .artwork-details {
-    padding: 20px 0;
+    flex: 1;
+    padding: 80px 60px;
+    overflow-y: auto;
+    background-color: #fff;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
 }
 
 .artwork-details h3 {
-    font-size: 2rem;
-    margin-bottom: 1.5rem;
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
     color: #333;
+    font-weight: 500;
+    line-height: 1.2;
 }
 
 .artwork-metadata {
-    margin-bottom: 2rem;
-    padding-bottom: 1.5rem;
+    margin: 2rem 0;
+    padding-bottom: 2rem;
     border-bottom: 1px solid rgba(0, 0, 0, 0.1);
 }
 
 .artwork-metadata p {
     margin-bottom: 0.5rem;
     color: #666;
+    font-size: 1.1rem;
 }
 
 .artwork-description {
     margin-bottom: 2rem;
     line-height: 1.8;
     color: #333;
+    font-size: 1.1rem;
 }
 
 .inquiry-button {
@@ -793,8 +840,13 @@ footer a {
 
 @media (max-width: 1024px) {
     .modal-body {
-        grid-template-columns: 1fr;
-        gap: 20px;
+        flex-direction: column;
+    }
+
+    .artwork-image,
+    .artwork-details {
+        flex: none;
+        width: 100%;
     }
 
     .artwork-image {
@@ -802,16 +854,22 @@ footer a {
     }
 
     .artwork-details {
-        padding: 0;
+        height: 50vh;
+        padding: 40px;
+    }
+
+    .modal-close {
+        top: 20px;
+        right: 20px;
     }
 }
 
 @media (max-width: 768px) {
-    .modal-content {
-        padding: 20px;
+    .artwork-details {
+        padding: 30px;
     }
 
     .artwork-details h3 {
-        font-size: 1.5rem;
+        font-size: 2rem;
     }
 } 

@@ -1,0 +1,48 @@
+{
+    "artworks": [
+        {
+            "id": "artwork1",
+            "title": {
+                "en": "Mountain Landscape in Ink",
+                "tw": "水墨山水",
+                "cn": "水墨山水",
+                "jp": "水墨山水"
+            },
+            "year": "2023",
+            "dimensions": "120 x 180 cm",
+            "medium": "Ink and color on paper",
+            "description": {
+                "en": "A contemplative landscape depicting the misty mountains of Taiwan's central range.",
+                "tw": "以水墨描繪台灣中央山脈的靈秀之氣。",
+                "cn": "以水墨描绘台湾中央山脉的灵秀之气。",
+                "jp": "台湾中央山脈の霊気を水墨で表現。"
+            },
+            "image": "artwork1.jpg",
+            "tags": ["landscape", "ink", "mountains"],
+            "created_at": "2023-01-15",
+            "updated_at": "2024-03-20"
+        },
+        {
+            "id": "artwork2",
+            "title": {
+                "en": "Traditional Architecture",
+                "tw": "傳統建築",
+                "cn": "传统建筑",
+                "jp": "伝統建築"
+            },
+            "year": "2022",
+            "dimensions": "90 x 150 cm",
+            "medium": "Ink and color on paper",
+            "description": {
+                "en": "A detailed study of traditional Taiwanese temple architecture.",
+                "tw": "台灣傳統寺廟建築的細緻描繪。",
+                "cn": "台湾传统寺庙建筑的细致描绘。",
+                "jp": "台湾の伝統的な寺院建築の細密な描写。"
+            },
+            "image": "artwork2.jpg",
+            "tags": ["architecture", "temple", "traditional"],
+            "created_at": "2022-06-20",
+            "updated_at": "2024-03-20"
+        }
+    ]
+} 
