@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="images/logo.png">
+    <title>Tsung-Jen Pai | Artist</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif:wght@400;500;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header>
+        <nav>
+            <div class="logo">
+                <a href="./"><img src="./images/logo.png" alt="Tsung-Jen Pai Logo"></a>
+            </div>
+            <button class="hamburger" aria-label="Menu">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+            <ul class="nav-links">
+                <li><a href="#selected-works" data-i18n="nav.selectedWorks">Selected works</a></li>
+                <li><a href="#exhibitions" data-i18n="nav.exhibitions">Exhibitions</a></li>
+                <li><a href="#biography" data-i18n="nav.biography">Biography</a></li>
+                <li><a href="#contact" data-i18n="nav.contact">Contact</a></li>
+                <li class="language-selector">
+                    <button class="language-switch">EN <span class="arrow">▾</span></button>
+                    <ul class="language-dropdown">
+                        <li><button data-lang="en">EN</button></li>
+                        <li><button data-lang="tw">TW</button></li>
+                        <li><button data-lang="cn">CN</button></li>
+                        <li><button data-lang="jp">JP</button></li>
+                    </ul>
+                </li>
+            </ul>
+        </nav>
+        <div class="mobile-menu">
+            <ul class="mobile-nav-links">
+                <li><a href="#selected-works" data-i18n="nav.selectedWorks">Selected works</a></li>
+                <li><a href="#exhibitions" data-i18n="nav.exhibitions">Exhibitions</a></li>
+                <li><a href="#biography" data-i18n="nav.biography">Biography</a></li>
+                <li><a href="#contact" data-i18n="nav.contact">Contact</a></li>
+                <li class="language-selector">
+                    <button class="language-switch">EN <span class="arrow">▾</span></button>
+                    <ul class="language-dropdown">
+                        <li><button data-lang="en">EN</button></li>
+                        <li><button data-lang="tw">TW</button></li>
+                        <li><button data-lang="cn">CN</button></li>
+                        <li><button data-lang="jp">JP</button></li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+    </header>
+
+    <main>
+        <section class="hero">
+            <div class="hero-slideshow">
+                <img src="images/hero-banner.gif" alt="Featured Artwork Animation" class="hero-image active" onerror="this.onerror=null; this.src='images/artwork1.jpg';">
+                <img src="images/hero-image2.gif" alt="Featured Artwork" class="hero-image" onerror="this.onerror=null; this.src='images/artwork1.jpg';">
+            </div>
+        </section>
+
+        <section id="biography" class="biography">
+            <div class="bio-content">
+                <div class="bio-image animate-fade">
+                    <img src="images/Profile.jpg?v=1" alt="Tsung-Jen Pai Portrait">
+                </div>
+                <div class="bio-text-content">
+                    <h2 class="section-title animate-fade" data-i18n="biography.title">Tsung-Jen Pai 白宗仁</h2>
+                    <div class="bio-text animate-content">
+                        <p data-i18n="biography.paragraph1">Born in Taichung, Taiwan in 1963, Tsung-Jen Pai graduated from the Fine Arts Department of Chinese Culture University in 1985. He furthered his education, earning a Master of Arts degree from the Graduate Institute of Art History at the same university in 1990, and a doctorate in Fine Arts from the China National Academy of Arts in Beijing.</p>
+                        <p data-i18n="biography.paragraph2">His academic career includes serving as a professor in the Department of Fine Arts at the National Taiwan University of Science and Technology.</p>
+                        <p data-i18n="biography.paragraph3">As Secretary-General of both the Chinese Painting Institute and the Cross-Strait Cultural and Art Foundation, Tsung-Jen Pai has significantly contributed to fostering artistic and cultural exchange across the Taiwan Strait. His work has been recognized through international exhibitions and cultural exchanges, promoting dialogue between artists from both sides.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="selected-works" class="gallery">
+            <h2 class="section-title animate-fade" data-i18n="gallery.title">Selected works</h2>
+            <div class="carousel-container animate-content">
+                <button class="carousel-button prev" aria-label="Previous artwork">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M15 18L9 12L15 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </button>
+                
+                <div class="carousel-track-container">
+                    <div class="carousel-track">
+                        <div class="carousel-slide" data-artwork-id="artwork1">
+                            <img src="images/artwork1.jpg" alt="Mountain Landscape in Ink" data-i18n-alt="gallery.artwork1">
+                        </div>
+                        <div class="carousel-slide" data-artwork-id="artwork2">
+                            <img src="images/artwork2.jpg" alt="Traditional Architecture" data-i18n-alt="gallery.artwork2">
+                        </div>
+                        <div class="carousel-slide" data-artwork-id="artwork3">
+                            <img src="images/artwork3.jpg" alt="Misty Mountains" data-i18n-alt="gallery.artwork3">
+                        </div>
+                        <div class="carousel-slide" data-artwork-id="artwork4">
+                            <img src="images/artwork4.jpg" alt="Landscape Study" data-i18n-alt="gallery.artwork4">
+                        </div>
+                    </div>
+                </div>
+
+                <button class="carousel-button next" aria-label="Next artwork">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M9 18L15 12L9 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </button>
+
+                <div class="carousel-nav">
+                    <button class="carousel-indicator active" data-index="0" aria-label="Go to artwork 1"></button>
+                    <button class="carousel-indicator" data-index="1" aria-label="Go to artwork 2"></button>
+                    <button class="carousel-indicator" data-index="2" aria-label="Go to artwork 3"></button>
+                    <button class="carousel-indicator" data-index="3" aria-label="Go to artwork 4"></button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Artwork Detail Modal -->
+        <div class="artwork-modal" id="artwork-modal">
+            <div class="modal-content">
+                <button class="modal-close" aria-label="Close modal">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M18 6L6 18M6 6L18 18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </button>
+                <div class="modal-body">
+                    <div class="artwork-image">
+                        <img src="" alt="" id="modal-image">
+                    </div>
+                    <div class="artwork-details">
+                        <h3 id="modal-title"></h3>
+                        <div class="artwork-metadata">
+                            <p id="modal-year"></p>
+                            <p id="modal-dimensions"></p>
+                            <p id="modal-medium"></p>
+                        </div>
+                        <p id="modal-description" class="artwork-description"></p>
+                        <a href="mailto:tsunggenpai@gmail.com" class="inquiry-button" data-i18n="gallery.inquire">Inquire about this artwork</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <section id="contact" class="contact">
+            <h2 class="section-title animate-fade" data-i18n="contact.title">Contact</h2>
+            <div class="contact-info animate-content">
+                <p data-i18n="contact.intro">For inquiries about artworks or exhibitions, please contact:</p>
+                <p data-i18n="contact.email">Email: contact@tsungjenpai.com</p>
+                <p data-i18n="contact.studio">Studio: Taipei, Taiwan</p>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p data-i18n="footer.copyright">Tsung-Jen Pai 2024 All Rights Reserved</p>
+        <a href="/privacy-policy" data-i18n="footer.privacy">Privacy policy</a>
+    </footer>
+
+    <script src="translations.js"></script>
+    <script src="script.js"></script>
+</body>
+</html> 
