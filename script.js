@@ -5,9 +5,19 @@ document.addEventListener('DOMContentLoaded', function() {
         images: document.querySelectorAll('.hero-image'),
         currentIndex: 0,
         interval: null,
+        transitionInProgress: false,
 
         init() {
-            // Start automatic slideshow
+            // Preload images
+            Array.from(this.images).forEach(img => {
+                if (img.complete) {
+                    this.handleImageLoad();
+                } else {
+                    img.addEventListener('load', () => this.handleImageLoad());
+                }
+            });
+
+            // Start automatic slideshow once images are loaded
             this.startSlideshow();
 
             // Pause on hover
@@ -16,7 +26,15 @@ document.addEventListener('DOMContentLoaded', function() {
             heroSection.addEventListener('mouseleave', () => this.startSlideshow());
         },
 
+        handleImageLoad() {
+            // Start slideshow when images are loaded
+            this.startSlideshow();
+        },
+
         goToSlide(index) {
+            if (this.transitionInProgress) return;
+            this.transitionInProgress = true;
+
             // Remove active class from current
             this.images[this.currentIndex].classList.remove('active');
 
@@ -25,16 +43,24 @@ document.addEventListener('DOMContentLoaded', function() {
 
             // Add active class to new current
             this.images[this.currentIndex].classList.add('active');
+
+            // Reset transition flag after animation completes
+            setTimeout(() => {
+                this.transitionInProgress = false;
+            }, 300); // Match this with CSS transition duration
         },
 
         nextSlide() {
-            const nextIndex = (this.currentIndex + 1) % this.images.length;
-            this.goToSlide(nextIndex);
+            if (!this.transitionInProgress) {
+                const nextIndex = (this.currentIndex + 1) % this.images.length;
+                this.goToSlide(nextIndex);
+            }
         },
 
         startSlideshow() {
             if (this.interval) clearInterval(this.interval);
-            this.interval = setInterval(() => this.nextSlide(), 2000);
+            // Set a longer interval for GIFs to ensure they have time to play
+            this.interval = setInterval(() => this.nextSlide(), 5000);
         },
 
         pauseSlideshow() {
@@ -49,7 +75,7 @@ document.addEventListener('DOMContentLoaded', function() {
     slideshow.init();
 
     // Section-based scrolling
-    const sections = document.querySelectorAll('.hero, .biography, .gallery, .contact');
+    const sections = document.querySelectorAll('.hero, .biography, .gallery, .exhibitions, .contact');
     let isScrolling = false;
     let currentSection = 0;
 
@@ -458,43 +484,17 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Artwork Modal functionality
     const modal = {
+        currentIndex: 0,
+        artworkIds: Object.keys(artworkData),
+
         init() {
             this.modal = document.getElementById('artwork-modal');
             if (!this.modal) {
-                // Create modal if it doesn't exist
                 this.createModal();
             }
             
             this.setupEventListeners();
             this.setupArtworkClicks();
-        },
-
-        createModal() {
-            const modalHTML = `
-                <div id="artwork-modal" class="artwork-modal">
-                    <div class="modal-content">
-                        <button class="modal-close" aria-label="Close modal"></button>
-                        <div class="modal-body">
-                            <div class="artwork-image">
-                                <img id="modal-image" src="" alt="">
-                            </div>
-                            <div class="artwork-details">
-                                <h3 id="modal-title"></h3>
-                                <div class="artwork-metadata">
-                                    <p id="modal-year"></p>
-                                    <p id="modal-dimensions"></p>
-                                    <p id="modal-medium"></p>
-                                </div>
-                                <div class="artwork-description">
-                                    <p id="modal-description"></p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            `;
-            document.body.insertAdjacentHTML('beforeend', modalHTML);
-            this.modal = document.getElementById('artwork-modal');
         },
 
         setupEventListeners() {
@@ -509,12 +509,34 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             });
 
-            // Escape key to close
+            // Navigation buttons
+            const prevButton = this.modal.querySelector('.modal-nav.prev');
+            const nextButton = this.modal.querySelector('.modal-nav.next');
+            
+            prevButton.addEventListener('click', () => this.navigate('prev'));
+            nextButton.addEventListener('click', () => this.navigate('next'));
+
+            // Keyboard navigation
             document.addEventListener('keydown', (e) => {
-                if (e.key === 'Escape' && this.modal.classList.contains('active')) {
+                if (!this.modal.classList.contains('active')) return;
+                
+                if (e.key === 'Escape') {
                     this.hide();
+                } else if (e.key === 'ArrowLeft') {
+                    this.navigate('prev');
+                } else if (e.key === 'ArrowRight') {
+                    this.navigate('next');
                 }
             });
+        },
+
+        navigate(direction) {
+            const totalArtworks = this.artworkIds.length;
+            this.currentIndex = direction === 'next' 
+                ? (this.currentIndex + 1) % totalArtworks
+                : (this.currentIndex - 1 + totalArtworks) % totalArtworks;
+            
+            this.show(this.artworkIds[this.currentIndex]);
         },
 
         setupArtworkClicks() {
@@ -522,6 +544,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 slide.addEventListener('click', () => {
                     const artworkId = slide.getAttribute('data-artwork-id');
                     if (artworkId && artworkData[artworkId]) {
+                        this.currentIndex = this.artworkIds.indexOf(artworkId);
                         this.show(artworkId);
                     }
                 });
@@ -548,12 +571,12 @@ document.addEventListener('DOMContentLoaded', function() {
             modalDescription.textContent = artwork.description[lang];
             
             this.modal.classList.add('active');
-            document.body.style.overflow = 'hidden';
+            document.body.classList.add('modal-open');
         },
 
         hide() {
             this.modal.classList.remove('active');
-            document.body.style.overflow = '';
+            document.body.classList.remove('modal-open');
         },
 
         updateLanguage(lang) {
@@ -570,8 +593,114 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     };
 
-    // Initialize modal
+    // Exhibition data
+    const exhibitionData = {
+        exhibition1: {
+            title: "Mountain and Water: A Solo Exhibition",
+            duration: "2024.03.15 - 2024.04.30",
+            description: "A comprehensive showcase of recent works exploring the harmony between mountains and water in traditional Chinese landscape painting.",
+            image: "images/Exhibition1.jpg"
+        },
+        exhibition2: {
+            title: "Tradition Meets Contemporary",
+            duration: "2024.05.10 - 2024.06.20",
+            description: "An exhibition bridging classical Chinese painting techniques with contemporary artistic expression.",
+            image: "images/Exhibition2.jpg"
+        },
+        exhibition3: {
+            title: "The Spirit of Ink",
+            duration: "2024.07.01 - 2024.08.15",
+            description: "A collection of works demonstrating the versatility and spiritual depth of ink painting in modern context.",
+            image: "images/Exhibition3.jpg"
+        }
+    };
+
+    // Exhibition modal functionality
+    const exhibitionModal = {
+        currentIndex: 0,
+        exhibitionIds: Object.keys(exhibitionData),
+
+        init() {
+            this.modal = document.getElementById('exhibition-modal');
+            this.setupEventListeners();
+            this.setupExhibitionClicks();
+        },
+
+        setupEventListeners() {
+            // Close button
+            const closeButton = this.modal.querySelector('.modal-close');
+            closeButton.addEventListener('click', () => this.hide());
+
+            // Click outside to close
+            this.modal.addEventListener('click', (e) => {
+                if (e.target === this.modal) {
+                    this.hide();
+                }
+            });
+
+            // Navigation buttons
+            const prevButton = this.modal.querySelector('.modal-nav.prev');
+            const nextButton = this.modal.querySelector('.modal-nav.next');
+            
+            prevButton.addEventListener('click', () => this.navigate('prev'));
+            nextButton.addEventListener('click', () => this.navigate('next'));
+
+            // Keyboard navigation
+            document.addEventListener('keydown', (e) => {
+                if (!this.modal.classList.contains('active')) return;
+                
+                if (e.key === 'Escape') {
+                    this.hide();
+                } else if (e.key === 'ArrowLeft') {
+                    this.navigate('prev');
+                } else if (e.key === 'ArrowRight') {
+                    this.navigate('next');
+                }
+            });
+        },
+
+        navigate(direction) {
+            const totalExhibitions = this.exhibitionIds.length;
+            this.currentIndex = direction === 'next' 
+                ? (this.currentIndex + 1) % totalExhibitions
+                : (this.currentIndex - 1 + totalExhibitions) % totalExhibitions;
+            
+            this.show(this.exhibitionIds[this.currentIndex]);
+        },
+
+        setupExhibitionClicks() {
+            document.querySelectorAll('.exhibition-item').forEach(item => {
+                item.addEventListener('click', () => {
+                    const exhibitionId = item.dataset.exhibition;
+                    if (exhibitionId && exhibitionData[exhibitionId]) {
+                        this.currentIndex = this.exhibitionIds.indexOf(exhibitionId);
+                        this.show(exhibitionId);
+                    }
+                });
+            });
+        },
+
+        show(exhibitionId) {
+            const data = exhibitionData[exhibitionId];
+            
+            document.getElementById('modal-exhibition-image').src = data.image;
+            document.getElementById('modal-exhibition-title').textContent = data.title;
+            document.getElementById('modal-exhibition-duration').textContent = data.duration;
+            document.getElementById('modal-exhibition-description').textContent = data.description;
+            
+            this.modal.classList.add('active');
+            document.body.classList.add('modal-open');
+        },
+
+        hide() {
+            this.modal.classList.remove('active');
+            document.body.classList.remove('modal-open');
+        }
+    };
+
+    // Initialize modals
     modal.init();
+    exhibitionModal.init();
 
     // Update modal language when language changes
     const originalSetLanguage = window.setLanguage;
@@ -579,6 +708,24 @@ document.addEventListener('DOMContentLoaded', function() {
         originalSetLanguage(lang);
         modal.updateLanguage(lang);
     };
+
+    // Contact form submission
+    function sendEmail(event) {
+        event.preventDefault();
+        
+        const name = document.getElementById('name').value;
+        const contactInfo = document.getElementById('contact-info').value;
+        const message = document.getElementById('message').value;
+        
+        const mailtoLink = `mailto:pai016@gmail.com?cc=hsinyupai@gmail.com&subject=Website Inquiry from ${encodeURIComponent(name)}&body=${encodeURIComponent(`Name: ${name}\nContact Info: ${contactInfo}\n\nMessage:\n${message}`)}`;
+        
+        window.location.href = mailtoLink;
+        
+        // Clear form
+        document.getElementById('contact-form').reset();
+        
+        return false;
+    }
 });
 
 // Function to set language

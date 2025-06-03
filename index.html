@@ -6,7 +6,7 @@
     <link rel="icon" type="image/png" href="images/logo.png">
     <title>Tsung-Jen Pai | Artist</title>
     <link rel="stylesheet" href="styles.css">
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;600&display=swap" rel="stylesheet">
 </head>
 <body>
     <header>
@@ -20,9 +20,9 @@
                 <span></span>
             </button>
             <ul class="nav-links">
+                <li><a href="#biography" data-i18n="nav.biography">Biography</a></li>
                 <li><a href="#selected-works" data-i18n="nav.selectedWorks">Selected works</a></li>
                 <li><a href="#exhibitions" data-i18n="nav.exhibitions">Exhibitions</a></li>
-                <li><a href="#biography" data-i18n="nav.biography">Biography</a></li>
                 <li><a href="#contact" data-i18n="nav.contact">Contact</a></li>
                 <li class="language-selector">
                     <button class="language-switch">EN <span class="arrow">▾</span></button>
@@ -37,9 +37,9 @@
         </nav>
         <div class="mobile-menu">
             <ul class="mobile-nav-links">
+                <li><a href="#biography" data-i18n="nav.biography">Biography</a></li>
                 <li><a href="#selected-works" data-i18n="nav.selectedWorks">Selected works</a></li>
                 <li><a href="#exhibitions" data-i18n="nav.exhibitions">Exhibitions</a></li>
-                <li><a href="#biography" data-i18n="nav.biography">Biography</a></li>
                 <li><a href="#contact" data-i18n="nav.contact">Contact</a></li>
                 <li class="language-selector">
                     <button class="language-switch">EN <span class="arrow">▾</span></button>
@@ -59,6 +59,9 @@
             <div class="hero-slideshow">
                 <img src="images/hero-banner.gif" alt="Featured Artwork Animation" class="hero-image active" onerror="this.onerror=null; this.src='images/artwork1.jpg';">
                 <img src="images/hero-image2.gif" alt="Featured Artwork" class="hero-image" onerror="this.onerror=null; this.src='images/artwork1.jpg';">
+            </div>
+            <div class="hero-overlay">
+                <img src="images/outline.svg" alt="Decorative Overlay" class="hero-overlay-svg">
             </div>
         </section>
 
@@ -119,6 +122,54 @@
             </div>
         </section>
 
+        <section id="exhibitions" class="exhibitions">
+            <h2 class="section-title animate-fade" data-i18n="exhibitions.title">Exhibitions</h2>
+            <div class="exhibitions-grid animate-content">
+                <div class="exhibition-item" data-exhibition="exhibition1">
+                    <img src="images/Exhibition1.jpg" alt="Exhibition 1" loading="lazy">
+                    <div class="exhibition-overlay">
+                        <span class="view-details" data-i18n="exhibitions.viewDetails">View Details</span>
+                    </div>
+                </div>
+                <div class="exhibition-item" data-exhibition="exhibition2">
+                    <img src="images/Exhibition2.jpg" alt="Exhibition 2" loading="lazy">
+                    <div class="exhibition-overlay">
+                        <span class="view-details" data-i18n="exhibitions.viewDetails">View Details</span>
+                    </div>
+                </div>
+                <div class="exhibition-item" data-exhibition="exhibition3">
+                    <img src="images/Exhibition3.jpg" alt="Exhibition 3" loading="lazy">
+                    <div class="exhibition-overlay">
+                        <span class="view-details" data-i18n="exhibitions.viewDetails">View Details</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="contact" class="contact">
+            <h2 class="section-title animate-fade" data-i18n="contact.title">Contact</h2>
+            <div class="contact-form-container animate-content">
+                <form id="contact-form" class="contact-form" onsubmit="return sendEmail(event)">
+                    <div class="form-group">
+                        <label for="name" data-i18n="contact.name">Name</label>
+                        <input type="text" id="name" name="name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="contact-info" data-i18n="contact.contactInfo">Contact Information</label>
+                        <input type="text" id="contact-info" name="contact-info" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="message" data-i18n="contact.message">Message</label>
+                        <textarea id="message" name="message" rows="5" required></textarea>
+                    </div>
+                    <button type="submit" class="submit-button" data-i18n="contact.send">Send</button>
+                </form>
+            </div>
+        </section>
+    </main>
+
+    <!-- Modals -->
+    <div class="modals-container">
         <!-- Artwork Detail Modal -->
         <div class="artwork-modal" id="artwork-modal">
             <div class="modal-content">
@@ -130,6 +181,16 @@
                 <div class="modal-body">
                     <div class="artwork-image">
                         <img src="" alt="" id="modal-image">
+                        <button class="modal-nav prev" aria-label="Previous artwork">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M15 18L9 12L15 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </button>
+                        <button class="modal-nav next" aria-label="Next artwork">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M9 18L15 12L9 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </button>
                     </div>
                     <div class="artwork-details">
                         <h3 id="modal-title"></h3>
@@ -145,15 +206,42 @@
             </div>
         </div>
 
-        <section id="contact" class="contact">
-            <h2 class="section-title animate-fade" data-i18n="contact.title">Contact</h2>
-            <div class="contact-info animate-content">
-                <p data-i18n="contact.intro">For inquiries about artworks or exhibitions, please contact:</p>
-                <p data-i18n="contact.email">Email: contact@tsungjenpai.com</p>
-                <p data-i18n="contact.studio">Studio: Taipei, Taiwan</p>
+        <!-- Exhibition Modal -->
+        <div class="exhibition-modal" id="exhibition-modal">
+            <div class="modal-content">
+                <button class="modal-close" aria-label="Close modal">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M18 6L6 18M6 6L18 18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </button>
+                <div class="modal-body">
+                    <div class="artwork-image">
+                        <img src="" alt="" id="modal-exhibition-image">
+                        <button class="modal-nav prev" aria-label="Previous exhibition">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M15 18L9 12L15 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </button>
+                        <button class="modal-nav next" aria-label="Next exhibition">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M9 18L15 12L9 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </button>
+                    </div>
+                    <div class="artwork-details">
+                        <h3 id="modal-exhibition-title"></h3>
+                        <div class="artwork-metadata">
+                            <p id="modal-exhibition-duration"></p>
+                            <p id="modal-exhibition-location"></p>
+                        </div>
+                        <div class="artwork-description">
+                            <p id="modal-exhibition-description"></p>
+                        </div>
+                    </div>
+                </div>
             </div>
-        </section>
-    </main>
+        </div>
+    </div>
 
     <footer>
         <p data-i18n="footer.copyright">Tsung-Jen Pai 2024 All Rights Reserved</p>
